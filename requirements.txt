@@ -1,0 +1,4 @@
+--pre
+redis
+imdbpy
+py-cord==2.4.1
