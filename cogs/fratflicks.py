@@ -1,5 +1,6 @@
-import discord
+"""fratflicks class"""
 import logging
+import discord
 
 from imdb import IMDb
 from discord.ext import commands
@@ -17,30 +18,39 @@ features:
 """
 
 class FratFlicks(commands.Cog):
+    """Handlers and Commands for bot"""
     def __init__(self, bot):
         self.bot = bot
-        self.config = Config()
         self.imdb = IMDb()
+        self.config = Config()
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.channel.id != 1211852182656126997:
-            return
-        if message.author.bot:
-            return
-        # if message.role_mentions has the @movienight role
-        # pass to a diff function
+        """handle certain messages sent in the discord"""
+        try:
+            if message.channel.id != 1211852182656126997:
+                return
+            if message.author.bot:
+                return
+            movie_role = message.guild.get_role(1213246322405150772)
+            if movie_role in message.role_mentions:
+                await self.post_options(message)
+            if 'imdb' in message.contents.lower():
+                await self.new_movie(message)
+        except Exception as e: # pylint: disable=W0718
+            log.exception(f'on_message,{type(e)} error occured, {e}') #pylint: disable=W1203
 
     async def post_options(self, message):
+        """post options for people to choose from"""
         # scan_iter through keys
         # pull list of movies that haven't been watched
         # select 3 random movies from list
         # post with masked links in ordered list
         # 3 reactions for votes
         # another reaction for re-roll
-        pass
 
     async def new_movie(self, message):
+        """handle adding a movie from a imdb link to the db"""
         # get imdb link from message
         # pull out id tt01234567
         # use id # with self.imdb.get_movie
@@ -48,18 +58,17 @@ class FratFlicks(commands.Cog):
         # react to the post with check mark
         # add upvote react to track
         # react differently if its a duplicate
-        pass
 
     async def upvote(self, reaction):
+        """save upvoters to a movie"""
         # check the message for the imdb link
         # use self.imdb to get movie title
         # set "upvoted" to list of reactors
-        pass
 
     async def delete_movie(self, message):
+        """remove a movie from the db when the message is deleted"""
         # when user deletes a message
         # remove movie from list unless it was watched
-        pass
 
     @slash_command()
     async def movie(self,
@@ -85,6 +94,6 @@ class FratFlicks(commands.Cog):
         # add reaction for attendees
         # stop tracking reaction after 2 hours
 
-
 def setup(bot):
+    """load bot"""
     bot.add_cog(FratFlicks(bot))
